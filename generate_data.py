@@ -67,7 +67,7 @@ def _apply_override(override, cov, settings):
 
 
 def generate_df_gammas(
-    num_rows: int, settings: dict, cov: np.ndarray = None, overrides: list = []
+    num_rows: int, settings: dict, cov: np.ndarray = None, corr_overrides: list = []
 ):
     """Generate datasets with known m and u probabilities to feed into the Fellegi Sunter model
     Uses a Splink settings objects to configure data generation
@@ -76,7 +76,7 @@ def generate_df_gammas(
         num_rows (int): Number of rows to generate
         settings (dict): Splink settings dictionary
         cov (np.ndarray, optional): A covariance matrix, shape of n x n where n is number of comparison columns.  Defaults to None.
-        overrides (list, optional): Specific overrides to apply to the default covariance matrix which is an identity matrix. e.g. [["first_name", "surname", 0.5], ["first_name", "dob", 0.1]]. Defaults to [].
+        corr_overrides (list, optional): Specific corr_overrides to apply to the default covariance matrix which is an identity matrix. e.g. [["first_name", "surname", 0.5], ["first_name", "dob", 0.1]]. Defaults to [].
 
     Returns:
         pd.DataFrame: A pandas dataframe representing df_gammas
@@ -91,7 +91,7 @@ def generate_df_gammas(
     if not cov:
         cov = _gen_cov_matrix_no_correlation(settings)
 
-    for ov in overrides:
+    for ov in corr_overrides:
         _apply_override(ov, cov, settings)
 
     ran_data = _generate_uniform_random_numbers(num_matches, cov)
@@ -103,8 +103,8 @@ def generate_df_gammas(
     ran_data = _generate_uniform_random_numbers(num_non_matches, cov)
     non_matches = _ran_numbers_to_gammas(ran_data, settings, False)
     df_nm = pd.DataFrame(non_matches)
-    df_m["true_match_l"] = 0
-    df_m["true_match_r"] = 0
+    df_nm["true_match_l"] = 0
+    df_nm["true_match_r"] = 0
 
     df_all = pd.concat([df_m, df_nm])
 

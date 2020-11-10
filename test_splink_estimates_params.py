@@ -1,5 +1,6 @@
 from generate_data import generate_df_gammas
 from estimate_splink import estimate
+import statsmodels.api as sm
 
 settings = {
     "proportion_of_matches": 0.3,
@@ -26,10 +27,19 @@ settings = {
     "retain_intermediate_calculation_columns": False,
 }
 
-df_gammas = generate_df_gammas(500000, settings)
+# We expect independence conditional on match status
+df_gammas = generate_df_gammas(200000, settings)
 
+df_match = df_gammas[df_gammas["true_match_l"] == 0]
+y = df_match["gamma_first_name"]
+X = df_match[["gamma_surname", "gamma_col_3"]]
+X = sm.add_constant(X)
 
-dfe, linker = estimate(df_gammas, settings)
+model = sm.OLS(y, X)
+results = model.fit()
+print(results.summary())
+
+df_e, linker = estimate(df_gammas, settings)
 
 print(linker.params)
 
