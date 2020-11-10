@@ -9,7 +9,7 @@ from scipy.stats import norm
 from splink.settings import complete_settings_dict
 
 
-def gen_cov_matrix_no_correlation(settings):
+def _gen_cov_matrix_no_correlation(settings):
     cc = settings["comparison_columns"]
     num = len(cc)
     a = np.zeros((num, num), float)
@@ -17,7 +17,7 @@ def gen_cov_matrix_no_correlation(settings):
     return a
 
 
-def generate_uniform_random_numbers(num_rows, cov):
+def _generate_uniform_random_numbers(num_rows, cov):
 
     mean = np.zeros(cov.shape[0])
 
@@ -26,7 +26,7 @@ def generate_uniform_random_numbers(num_rows, cov):
     return data
 
 
-def ran_numbers_to_gammas(data, settings, is_match):
+def _ran_numbers_to_gammas(data, settings, is_match):
 
     v = {}
 
@@ -40,26 +40,26 @@ def ran_numbers_to_gammas(data, settings, is_match):
             bins = np.cumsum(bins)
 
         col_name = col["col_name"]
-        v[col_name] = np.digitize(ran_vector, bins, right=True)
+        v[f"gamma_{col_name}"] = np.digitize(ran_vector, bins, right=True)
     return v
 
 
-def add_essentials_to_settings(settings):
+def _add_essentials_to_settings(settings):
 
     if "link_type" not in settings:
         settings["link_type"] == "dedupe only"
     return settings
 
 
-def get_col_index(settings, name):
+def _get_col_index(settings, name):
     for i, col in enumerate(settings["comparison_columns"]):
         if col["col_name"] == name:
             return i
 
 
-def apply_override(override, cov, settings):
-    i0 = get_col_index(settings, override[0])
-    i1 = get_col_index(settings, override[1])
+def _apply_override(override, cov, settings):
+    i0 = _get_col_index(settings, override[0])
+    i1 = _get_col_index(settings, override[1])
 
     cov[i0, i1] = override[2]
     cov[i1, i0] = override[2]
@@ -82,27 +82,29 @@ def generate_df_gammas(
         pd.DataFrame: A pandas dataframe representing df_gammas
     """
 
-    settings = add_essentials_to_settings(settings)
+    settings = _add_essentials_to_settings(settings)
     settings = complete_settings_dict(settings, None)
 
     num_matches = math.floor(num_rows * settings["proportion_of_matches"])
     num_non_matches = math.ceil(num_rows * (1 - settings["proportion_of_matches"]))
 
     if not cov:
-        cov = gen_cov_matrix_no_correlation(settings)
+        cov = _gen_cov_matrix_no_correlation(settings)
 
     for ov in overrides:
-        apply_override(ov, cov, settings)
+        _apply_override(ov, cov, settings)
 
-    ran_data = generate_uniform_random_numbers(num_matches, cov)
-    matches = ran_numbers_to_gammas(ran_data, settings, True)
+    ran_data = _generate_uniform_random_numbers(num_matches, cov)
+    matches = _ran_numbers_to_gammas(ran_data, settings, True)
     df_m = pd.DataFrame(matches)
-    df_m["true_match"] = 1
+    df_m["true_match_l"] = 1
+    df_m["true_match_r"] = 1
 
-    ran_data = generate_uniform_random_numbers(num_non_matches, cov)
-    non_matches = ran_numbers_to_gammas(ran_data, settings, False)
+    ran_data = _generate_uniform_random_numbers(num_non_matches, cov)
+    non_matches = _ran_numbers_to_gammas(ran_data, settings, False)
     df_nm = pd.DataFrame(non_matches)
-    df_nm["true_match"] = 0
+    df_m["true_match_l"] = 0
+    df_m["true_match_r"] = 0
 
     df_all = pd.concat([df_m, df_nm])
 
