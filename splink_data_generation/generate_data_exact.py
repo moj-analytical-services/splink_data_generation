@@ -99,6 +99,7 @@ def generate_df_gammas_exact(settings, max_rows=1e6, limit_denominator=100):
     num_cols = len(cc)
     col_names = [c["col_name"] for c in cc]
 
+    col_names = [f"gamma_{c}" for c in col_names]
     mg_m = np.meshgrid(*vectors["m_vectors"])
     mg_m = np.array(mg_m).T.reshape(-1, num_cols)
     df_m = pd.DataFrame(mg_m, columns=col_names)
@@ -110,21 +111,3 @@ def generate_df_gammas_exact(settings, max_rows=1e6, limit_denominator=100):
     df_u["true_match"] = 0
 
     return pd.concat([df_m, df_u])
-
-
-settings = {
-    "proportion_of_matches": 0.2,
-    "link_type": "dedupe_only",
-    "comparison_columns": [
-        {
-            "col_name": "col_1",
-            "m_probabilities": [0.02, 0.02, 0.96],  # Probability of typo
-            "u_probabilities": [0.9, 0.05, 0.05],  # Probability of collision
-        },
-        {
-            "col_name": "col_2",
-            "m_probabilities": [0.333, 0.666],  # Probability of typo
-            "u_probabilities": [0.9, 0.1],  # Probability of collision
-        },
-    ],
-}
