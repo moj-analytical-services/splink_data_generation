@@ -1,4 +1,4 @@
-from generate_data import generate_df_gammas
+from generate_data_random import generate_df_gammas_random
 from estimate_splink import estimate
 import statsmodels.api as sm
 
@@ -28,7 +28,7 @@ settings = {
 }
 
 # We expect independence conditional on match status
-df_gammas = generate_df_gammas(200000, settings)
+df_gammas = generate_df_gammas)random(200000, settings)
 
 df_match = df_gammas[df_gammas["true_match_l"] == 0]
 y = df_match["gamma_first_name"]

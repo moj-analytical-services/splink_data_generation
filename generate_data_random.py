@@ -1,3 +1,12 @@
+# Generate synthetic datasets corresponding to user-provided
+# m and u probabilities using a random number generator
+
+# The data generating process (DGP) corresponds to the true parameters.
+# Rows are generated at at random from the DGP
+# so the parameters of the synthetic dataset will be close
+# to the supplied m and u values.  The more rows generated
+# the closer they will be
+
 from uuid import uuid4
 import math
 
@@ -66,7 +75,7 @@ def _apply_override(override, cov, settings):
     return cov
 
 
-def generate_df_gammas(
+def generate_df_gammas_random(
     num_rows: int, settings: dict, cov: np.ndarray = None, corr_overrides: list = []
 ):
     """Generate datasets with known m and u probabilities to feed into the Fellegi Sunter model

@@ -1,4 +1,4 @@
-from generate_data import generate_df_gammas
+from generate_data_random import generate_df_gammas_random
 from estimate_splink import estimate
 import statsmodels.api as sm
 import numpy as np
@@ -29,7 +29,7 @@ settings = {
 }
 
 # Create covariance between first_name and surname
-df_gammas = generate_df_gammas(
+df_gammas = generate_df_gammas_random(
     200000, settings, corr_overrides=[["first_name", "surname", 0.95]]
 )
 
