@@ -117,4 +117,11 @@ def generate_df_gammas_exact(settings, max_rows=1e6, limit_denominator=100):
     df_all["unique_id_l"] = [str(uuid4())[:8] for _ in range(len(df_all.index))]
     df_all["unique_id_r"] = [str(uuid4())[:8] for _ in range(len(df_all.index))]
 
+    match_prop = df_all["true_match_l"].mean()
+    warnings.warn(
+        f"Note that the proportion_of_matches setting is ignored by this generator. "
+        "Only the m_probabilities and u_probabilities are observed. "
+        f"The proportion of matches in the generated dataset was {match_prop:,.1f}"
+    )
+
     return df_all
