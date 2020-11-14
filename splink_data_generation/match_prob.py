@@ -17,8 +17,6 @@ def _row_match_probability(r, settings):
         p = cc[col_name]["m_probabilities"][val]
         numerator = numerator * p
 
-    r["numerator"] = numerator
-
     denominator = 1 - λ
     for col in gamma_cols:
         col_name = col.replace("gamma_", "")
