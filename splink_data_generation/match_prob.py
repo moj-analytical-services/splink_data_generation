@@ -1,3 +1,6 @@
+from copy import deepcopy
+
+
 def _row_match_probability(r, settings):
 
     λ = settings["proportion_of_matches"]
@@ -30,4 +33,7 @@ def _row_match_probability(r, settings):
 
 
 def add_match_prob(df, settings):
+    settings = deepcopy(settings)
+    settings["proportion_of_matches"] = df["true_match_l"].mean()
+    print(settings)
     return df.apply(_row_match_probability, axis=1, settings=settings)

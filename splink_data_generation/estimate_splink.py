@@ -13,10 +13,13 @@ def estimate(df_gammas: DataFrame, settings: dict, spark: SparkSession):
     """Take pandas datafrae of gammas and estimate splink model
 
     Args:
-        df_gammas (DataFrame): df_gammas
+        df_gammas (DataFrame): Pandas dataframe of df_gammas
         settings (dict): Splink settings dictionary
         spark (SparkSession): SparkSession object
     """
+
+    settings["retain_intermediate_calculation_columns"] = False
+    settings["retain_matching_columns"] = False
 
     df = spark.createDataFrame(df_gammas)
 
