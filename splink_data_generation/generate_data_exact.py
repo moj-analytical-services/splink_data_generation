@@ -2,6 +2,7 @@
 # that conforms exactly with the assumptions of the
 # Fellegi-Sunter model (i.e. conditional independence
 # of comparison vector values given match status
+from uuid import uuid4
 from fractions import Fraction
 import numpy as np
 import pandas as pd
@@ -103,11 +104,17 @@ def generate_df_gammas_exact(settings, max_rows=1e6, limit_denominator=100):
     mg_m = np.meshgrid(*vectors["m_vectors"])
     mg_m = np.array(mg_m).T.reshape(-1, num_cols)
     df_m = pd.DataFrame(mg_m, columns=col_names)
-    df_m["true_match"] = 1
+    df_m["true_match_l"] = 1
+    df_m["true_match_r"] = 1
 
     mg_u = np.meshgrid(*vectors["u_vectors"])
     mg_u = np.array(mg_u).T.reshape(-1, num_cols)
     df_u = pd.DataFrame(mg_u, columns=col_names)
-    df_u["true_match"] = 0
+    df_u["true_match_l"] = 0
+    df_u["true_match_r"] = 0
 
-    return pd.concat([df_m, df_u])
+    df_all = pd.concat([df_m, df_u])
+    df_all["unique_id_l"] = [str(uuid4())[:8] for _ in range(len(df_all.index))]
+    df_all["unique_id_r"] = [str(uuid4())[:8] for _ in range(len(df_all.index))]
+
+    return df_all

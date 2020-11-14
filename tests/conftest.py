@@ -9,6 +9,7 @@ def simple_settings(scope="module"):
         "comparison_columns": [
             {
                 "col_name": "col_1",
+                "num_levels": 3,
                 "m_probabilities": [0.1, 0.2, 0.7],  # Probability of typo
                 "u_probabilities": [0.7, 0.1, 0.2],  # Probability of collision
             },
