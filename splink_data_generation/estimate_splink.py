@@ -18,13 +18,12 @@ def estimate(df_gammas: DataFrame, settings: dict, spark: SparkSession):
         spark (SparkSession): SparkSession object
     """
 
-    settings["retain_intermediate_calculation_columns"] = False
     settings["retain_matching_columns"] = False
 
     df = spark.createDataFrame(df_gammas)
 
     linker = Splink(settings, spark=spark, df=df)
 
-    df_e = iterate(df, linker.params, linker.settings, spark)
+    df_e = iterate(df, linker.params, linker.settings, spark, compute_ll=True)
 
     return df_e, linker

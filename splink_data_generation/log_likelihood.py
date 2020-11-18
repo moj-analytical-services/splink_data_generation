@@ -1,7 +1,8 @@
 from copy import deepcopy
+import math
 
 
-def _row_match_probability(r, settings):
+def _row_ll(r, settings):
 
     λ = settings["proportion_of_matches"]
     cc = settings["comparison_columns"]
@@ -10,27 +11,29 @@ def _row_match_probability(r, settings):
 
     gamma_cols = [k for k in r.keys() if "gamma_" in k]
 
-    numerator = λ
+    # Prob of match
+    prob_match = λ
     for col in gamma_cols:
         col_name = col.replace("gamma_", "")
         val = r[col]
         p = cc[col_name]["m_probabilities"][val]
-        numerator = numerator * p
+        prob_match = prob_match * p
 
-    denominator = 1 - λ
+    prob_non_match = 1 - λ
     for col in gamma_cols:
         col_name = col.replace("gamma_", "")
         val = r[col]
         p = cc[col_name]["u_probabilities"][val]
-        denominator = denominator * p
+        prob_non_match = prob_non_match * p
 
-    r["true_match_probability_l"] = numerator / (numerator + denominator)
-    r["true_match_probability_r"] = numerator / (numerator + denominator)
+    r["true_log_likelihood_l"] = math.log(prob_match + prob_non_match)
+    r["true_log_likelihood_r"] = math.log(prob_match + prob_non_match)
 
     return r
 
 
-def add_match_prob(df, settings):
+def add_log_likelihood(df, settings, set_prop_from_true=True):
     settings = deepcopy(settings)
-    settings["proportion_of_matches"] = df["true_match_l"].mean()
-    return df.apply(_row_match_probability, axis=1, settings=settings)
+    if set_prop_from_true:
+        settings["proportion_of_matches"] = df["true_match_l"].mean()
+    return df.apply(_row_ll, axis=1, settings=settings)

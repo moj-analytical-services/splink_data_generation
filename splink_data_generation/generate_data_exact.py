@@ -8,6 +8,7 @@ import numpy as np
 import pandas as pd
 from functools import reduce
 import warnings
+from copy import deepcopy
 
 
 def _validate_sum(settings, limit_denominator):
@@ -80,6 +81,13 @@ def _generate_vectors(settings, limit_denominator):
 
 
 def generate_df_gammas_exact(settings, max_rows=1e6, limit_denominator=100):
+
+    # do not modify settings object
+    settings = deepcopy(settings)
+
+    # Value is irrelvant, it won't be used.  Needed for settings to validate
+    settings["proportion_of_matches"] = 0.0
+
     _validate_sum(settings, limit_denominator)
     vectors = _generate_vectors(settings, limit_denominator)
 
