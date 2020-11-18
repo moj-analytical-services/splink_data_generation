@@ -14,3 +14,7 @@ It has two main ways of generating data:
 
 - `generate_df_gammas_random`, which produces rows at random using the data generating mechanism specified by the supplied parameters.  This function allows the user to specify the proportion of matches, and a covariance matrix which dictates correlations between linking variables conditional on match status.  Since rows are generated at random, the parameters of the resultant dataset will converge to true parameters and the number of rows generated tends to infinity.
 
+
+You can run these notebooks in an interactive Jupyter notebook by clicking the button below:
+
+[![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/moj-analytical-services/splink_data_generation/main?urlpath=lab/tree/index.ipynb)
