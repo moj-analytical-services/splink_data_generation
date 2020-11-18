@@ -6,7 +6,7 @@ USER root
 
 
 RUN pip install splink
-RUN pip install splink_data_generation/
+RUN pip install .
 
 
 RUN chown -R ${NB_UID} ${HOME}
