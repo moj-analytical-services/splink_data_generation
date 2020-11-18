@@ -3,7 +3,7 @@ FROM jupyter/all-spark-notebook:8882c505faa8
 COPY . ${HOME}
 USER root
 
-RUN git clone https://github.com/moj-analytical-services/splink_data_generation.git
+
 
 RUN pip install splink
 RUN pip install splink_data_generation/
