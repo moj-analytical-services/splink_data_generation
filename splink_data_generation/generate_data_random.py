@@ -28,6 +28,8 @@ def _gen_cov_matrix_no_correlation(settings):
 
 def _generate_uniform_random_numbers(num_rows, cov):
 
+    if type(cov) == list:
+        cov = np.array(cov)
     mean = np.zeros(cov.shape[0])
 
     data = np.random.multivariate_normal(mean, cov, num_rows).T
@@ -76,7 +78,12 @@ def _apply_override(override, cov, settings):
 
 
 def generate_df_gammas_random(
-    num_rows: int, settings: dict, cov: np.ndarray = None, corr_overrides: list = []
+    num_rows: int,
+    settings: dict,
+    cov_m: np.ndarray = None,
+    cov_overrides_m: list = [],
+    cov_u: np.ndarray = None,
+    cov_overrides_u: list = [],
 ):
     """Generate datasets with known m and u probabilities to feed into the Fellegi Sunter model
     Uses a Splink settings objects to configure data generation
@@ -84,8 +91,10 @@ def generate_df_gammas_random(
     Args:
         num_rows (int): Number of rows to generate
         settings (dict): Splink settings dictionary
-        cov (np.ndarray, optional): A covariance matrix, shape of n x n where n is number of comparison columns.  Defaults to None.
-        corr_overrides (list, optional): Specific corr_overrides to apply to the default covariance matrix which is an identity matrix. e.g. [["first_name", "surname", 0.5], ["first_name", "dob", 0.1]]. Defaults to [].
+        cov_m (np.ndarray, optional): A covariance matrix for matches, shape of n x n where n is number of comparison columns.  Defaults to None.
+        cov_overrides_m (list, optional): Specific cov_overrides for matches to apply to the default covariance identity matrix. e.g. [["first_name", "surname", 0.5], ["first_name", "dob", 0.1]]. Defaults to [].
+        cov_u (np.ndarray, optional): A covariance matrix for non matches, shape of n x n where n is number of comparison columns.  Defaults to None.
+        cov_overrides_u (list, optional): Specific cov_overrides for non matches to apply to the default covariance identity matrix. e.g. [["first_name", "surname", 0.5], ["first_name", "dob", 0.1]]. Defaults to [].
 
     Returns:
         pd.DataFrame: A pandas dataframe representing df_gammas
@@ -97,19 +106,25 @@ def generate_df_gammas_random(
     num_matches = math.floor(num_rows * settings["proportion_of_matches"])
     num_non_matches = math.ceil(num_rows * (1 - settings["proportion_of_matches"]))
 
-    if not cov:
-        cov = _gen_cov_matrix_no_correlation(settings)
+    if not cov_m:
+        cov_m = _gen_cov_matrix_no_correlation(settings)
 
-    for ov in corr_overrides:
-        _apply_override(ov, cov, settings)
+    if not cov_u:
+        cov_u = _gen_cov_matrix_no_correlation(settings)
 
-    ran_data = _generate_uniform_random_numbers(num_matches, cov)
+    for override in cov_overrides_m:
+        _apply_override(override, cov_m, settings)
+
+    for override in cov_overrides_u:
+        _apply_override(override, cov_u, settings)
+
+    ran_data = _generate_uniform_random_numbers(num_matches, cov_m)
     matches = _ran_numbers_to_gammas(ran_data, settings, True)
     df_m = pd.DataFrame(matches)
     df_m["true_match_l"] = 1
     df_m["true_match_r"] = 1
 
-    ran_data = _generate_uniform_random_numbers(num_non_matches, cov)
+    ran_data = _generate_uniform_random_numbers(num_non_matches, cov_u)
     non_matches = _ran_numbers_to_gammas(ran_data, settings, False)
     df_nm = pd.DataFrame(non_matches)
     df_nm["true_match_l"] = 0
