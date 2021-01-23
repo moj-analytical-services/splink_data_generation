@@ -1,13 +1,13 @@
 [tool.poetry]
 name = "splink_data_generation"
-version = "0.2.0"
+version = "0.2.1"
 description = "Generate synthetic data with a specified data generating process"
 authors = ["Robin Linacre <robinlinacre@hotmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.6"
-numpy = "^1.19.4"
-pandas = "^1.1.4"
+numpy = "^1.13.3"
+pandas = "^1.0.0"
 splink = ">=0.1.0"
 
 [tool.poetry.dev-dependencies]
