@@ -41,6 +41,6 @@ print(results.summary())
 
 df_e, linker = estimate(df_gammas, settings)
 
-print(linker.params)
+print(linker.model)
 
-linker.params.bayes_factor_chart()
+linker.model.bayes_factor_chart()

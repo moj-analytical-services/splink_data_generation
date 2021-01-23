@@ -53,9 +53,9 @@ df_gammas = generate_df_gammas_random(1e6, settings)
 
 # df_e, linker = estimate(df_gammas, settings)
 
-# print(linker.params)
+# print(linker.model)
 
-# linker.params.bayes_factor_chart()
+# linker.model.bayes_factor_chart()
 
 # We have the real answer so use that to compute m and u
 f1 = df_gammas["true_match_l"] == 1

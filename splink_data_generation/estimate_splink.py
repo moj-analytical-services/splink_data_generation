@@ -1,15 +1,15 @@
 from splink import Splink
 from pandas import DataFrame
 
-from pyspark.context import SparkContext
 from pyspark.sql import SparkSession
 
 from splink.iterate import iterate
+from splink.model import Model
 
-from splink import Splink
 
-
-def estimate(df_gammas: DataFrame, settings: dict, spark: SparkSession):
+def estimate(
+    df_gammas: DataFrame, settings: dict, spark: SparkSession, compute_ll=True
+):
     """Take pandas datafrae of gammas and estimate splink model
 
     Args:
@@ -22,8 +22,8 @@ def estimate(df_gammas: DataFrame, settings: dict, spark: SparkSession):
 
     df = spark.createDataFrame(df_gammas)
 
-    linker = Splink(settings, spark=spark, df=df)
+    model = Model(settings, spark)
 
-    df_e = iterate(df, linker.params, linker.settings, spark, compute_ll=True)
+    df_e = iterate(df, model, spark, compute_ll=compute_ll)
 
-    return df_e, linker
+    return df_e, model

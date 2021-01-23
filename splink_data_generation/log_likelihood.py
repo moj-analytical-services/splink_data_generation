@@ -1,39 +1,32 @@
 from copy import deepcopy
-import math
+import numpy as np
 
 
-def _row_ll(r, settings):
-
-    λ = settings["proportion_of_matches"]
-    cc = settings["comparison_columns"]
-
-    cc = {c["col_name"]: c for c in cc}
-
-    gamma_cols = [k for k in r.keys() if "gamma_" in k]
-
-    # Prob of match
-    prob_match = λ
-    for col in gamma_cols:
-        col_name = col.replace("gamma_", "")
-        val = r[col]
-        p = cc[col_name]["m_probabilities"][val]
-        prob_match = prob_match * p
-
-    prob_non_match = 1 - λ
-    for col in gamma_cols:
-        col_name = col.replace("gamma_", "")
-        val = r[col]
-        p = cc[col_name]["u_probabilities"][val]
-        prob_non_match = prob_non_match * p
-
-    r["true_log_likelihood_l"] = math.log(prob_match + prob_non_match)
-    r["true_log_likelihood_r"] = math.log(prob_match + prob_non_match)
-
-    return r
-
-
-def add_log_likelihood(df, settings, set_prop_from_true=True):
+def add_log_likelihood(df, settings):
     settings = deepcopy(settings)
-    if set_prop_from_true:
-        settings["proportion_of_matches"] = df["true_match_l"].mean()
-    return df.apply(_row_ll, axis=1, settings=settings)
+    lam = df["true_match_l"].mean()
+    settings["proportion_of_matches"] = lam
+
+    # Formula from https://imai.fas.harvard.edu/research/files/linkage.pdf
+    # For further info see https://observablehq.com/@robinl/conditional-independence-and-repeated-application-of-bay
+
+    df["_pm"] = lam
+    df["_pu"] = 1 - lam
+    for cc in settings["comparison_columns"]:
+        m_lookup = {i: v for i, v in enumerate(cc["m_probabilities"])}
+        u_lookup = {i: v for i, v in enumerate(cc["u_probabilities"])}
+        if "custom_name" in cc:
+            name = cc["custom_name"]
+        else:
+            name = cc["col_name"]
+        df["_m"] = df[f"gamma_{name}"].map(m_lookup)
+        df["_u"] = df[f"gamma_{name}"].map(u_lookup)
+        df["_pm"] = df["_m"] * df["_pm"]
+        df["_pu"] = df["_u"] * df["_pu"]
+
+    df["true_log_likelihood_l"] = np.log(df["_pm"] + df["_pu"])
+    df["true_log_likelihood_r"] = df["true_log_likelihood_l"]
+
+    df = df.drop(["_m", "_u", "_pm", "_pu"], axis=1)
+
+    return df
