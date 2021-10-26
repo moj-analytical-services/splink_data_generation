@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "splink_data_generation"
-version = "0.2.1"
+version = "1.0.0"
 description = "Generate synthetic data with a specified data generating process"
 authors = ["Robin Linacre <robinlinacre@hotmail.com>"]
 

@@ -7,9 +7,7 @@ from splink.iterate import iterate
 from splink.model import Model
 
 
-def estimate(
-    df_gammas: DataFrame, settings: dict, spark: SparkSession, compute_ll=True
-):
+def estimate(df_gammas: DataFrame, settings: dict, spark: SparkSession):
     """Take pandas datafrae of gammas and estimate splink model
 
     Args:
@@ -24,6 +22,6 @@ def estimate(
 
     model = Model(settings, spark)
 
-    df_e = iterate(df, model, spark, compute_ll=compute_ll)
+    df_e = iterate(df, model, spark)
 
     return df_e, model
