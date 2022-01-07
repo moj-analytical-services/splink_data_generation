@@ -15,7 +15,7 @@ import numpy as np
 import pandas as pd
 from scipy.stats import norm
 
-from splink.settings import complete_settings_dict
+from splink.default_settings import complete_settings_dict
 
 
 def _gen_cov_matrix_no_correlation(settings):
